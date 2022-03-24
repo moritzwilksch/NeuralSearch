@@ -51,5 +51,24 @@ class ArticleLinkCollector:
             time.sleep(3)
 
 
-scraper = ArticleLinkCollector(base_url="https://ibkr.info/index?title=&type=article")
-scraper.run()
+class ArticleBodyCollector:
+    def __init__(self) -> None:
+        self.db = MongoClient(
+            f"mongodb://{os.getenv('MONGO_INITDB_ROOT_USERNAME')}:"
+            f"{os.getenv('MONGO_INITDB_ROOT_PASSWORD')}@"
+            f"{os.getenv('MONGO_IP')}:27017",
+            authSource="admin",
+        )["ibkr"]
+        self.articles = self.db.articles.find({"body": None})
+
+    def run(self):
+        for article in self.articles:
+            print(f"Collecting article {article['url']}...")
+            r = requests.get(article["url"])
+            soup = BeautifulSoup(r.text, "lxml")
+            body = soup.find("div", {"class": "node"}).text
+            # print(body)
+            self.db.articles.update_one(
+                {"_id": article["_id"]}, {"$set": {"body": body}}
+            )
+            time.sleep(2)
