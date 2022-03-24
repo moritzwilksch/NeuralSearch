@@ -1,6 +1,8 @@
-from pymongo import MongoClient
-import re
 import os
+import re
+
+import polars as pl
+from pymongo import MongoClient
 
 db = MongoClient(
     f"mongodb://{os.getenv('MONGO_INITDB_ROOT_USERNAME')}:"
@@ -11,7 +13,15 @@ db = MongoClient(
 
 
 articles = db.articles.aggregate(
-    [{"$group": {"_id": "$url", "body": {"$first": "$body"}}}]
+    [
+        {
+            "$group": {
+                "_id": "$url",
+                "body": {"$first": "$body"},
+                "title": {"$first": "$title"},
+            }
+        },
+    ],
 )
 
 
@@ -23,8 +33,16 @@ def clean(text: str) -> str:
     return text
 
 
-articles = [clean(a.get("body")) for a in articles]
-print(f"\n{'-'*80}\n".join(articles))
+articles = [
+    {"_id": a.get("_id"), "title": a.get("title"), "body": clean(a.get("body"))}
+    for a in articles
+]
 
-with open("data/ibkr_articles.txt", "w") as f:
-    f.write("\n".join(articles))
+
+df = pl.from_records(articles).rename({"_id": "url"})
+df.write_parquet("data/ibkr_articles.parquet")
+
+# print(f"\n{'-'*80}\n".join(articles))
+
+# with open("data/ibkr_articles.txt", "w") as f:
+#     f.write("\n".join(articles))
