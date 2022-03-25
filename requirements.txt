@@ -1,3 +1,4 @@
 pymongo
+spacy
 lxml
 beautifulsoup4
