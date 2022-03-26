@@ -3,6 +3,8 @@ from abc import ABC, abstractmethod
 import numpy as np
 import polars as pl
 import spacy
+import tensorflow as tf
+from sentence_transformers import SentenceTransformer, util
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
@@ -89,7 +91,7 @@ class AutoEncoderModel(BaseSearchModel):
         self.vectorizer = TfidfVectorizer(
             # analyzer="char_wb", ngram_range=(3, 5), max_df=0.7
             analyzer="word",
-            ngram_range=(1, 1),
+            ngram_range=(1, 2),
             max_df=0.7,
         )
 
@@ -102,11 +104,16 @@ class AutoEncoderModel(BaseSearchModel):
 
         print(self.vectorized_articles.shape)
         self.nn = AutoEncoder(
-            vocab_size=self.vectorized_articles.shape[-1], bottleneck_dim=300
+            vocab_size=self.vectorized_articles.shape[-1], bottleneck_dim=64
         )
-        self.nn.compile("adam", "mean_squared_error")
+        self.nn.compile(tf.keras.optimizers.Adam(learning_rate=0.01), "huber")
+        tb_callback = tf.keras.callbacks.TensorBoard(log_dir="./logs")
         self.nn.fit(
-            self.vectorized_articles, self.vectorized_articles, batch_size=128, epochs=25
+            self.vectorized_articles,
+            self.vectorized_articles,
+            batch_size=128,
+            epochs=200,
+            callbacks=[tb_callback],
         )
         self.vectors = self.nn(self.vectorized_articles, return_vector=True).numpy()
 
@@ -116,4 +123,28 @@ class AutoEncoderModel(BaseSearchModel):
         ).numpy()
         similarities = cosine_similarity(self.vectorized_query, self.vectors)
         top_idxs = self.top_k(similarities, 3)
+        return self.data[top_idxs]
+
+
+# -----------------------------------------------------------------------------
+
+
+class SentenceEncoderModel(BaseSearchModel):
+    def __init__(self) -> None:
+        super().__init__()
+
+    def fit(self, data: pl.DataFrame) -> None:
+        super().fit(data)
+
+        self.model = SentenceTransformer(
+            "sentence-transformers/msmarco-distilbert-dot-v5"
+        )
+        print("loaded")
+
+        self.doc_emb = self.model.encode(self.data["body"].to_list())
+
+    def search(self, query: str) -> pl.DataFrame:
+        query_emb = self.model.encode([query])
+        scores = util.dot_score(query_emb, self.doc_emb)[0].cpu().tolist()
+        top_idxs = self.top_k([scores], 3)
         return self.data[top_idxs]

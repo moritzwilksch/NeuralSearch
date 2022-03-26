@@ -8,14 +8,18 @@ c = Console()
 
 import polars as pl
 
-from src.search.models import AutoEncoderModel, SpacyEmbeddingModel, TfidfSearchModel
+from src.search.models import (
+    AutoEncoderModel,
+    SentenceEncoderModel,
+    SpacyEmbeddingModel,
+    TfidfSearchModel,
+)
 
 df = pl.read_parquet("data/ibkr_articles.parquet")
+
 # model = TfidfSearchModel()
 # model.fit(df)
 # results = model.search("inactivity fee")
-
-# #%%
 
 
 # model = SpacyEmbeddingModel()
@@ -23,7 +27,13 @@ df = pl.read_parquet("data/ibkr_articles.parquet")
 # results = model.search("inactivity fee")
 # print("done")
 
-model = AutoEncoderModel()
+# model = AutoEncoderModel()
+# model.fit(df)
+# results = model.search("inactivity fee")
+# print(results)
+
+
+model = SentenceEncoderModel()
 model.fit(df)
 results = model.search("inactivity fee")
 print(results)

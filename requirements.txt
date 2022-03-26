@@ -1,4 +1,5 @@
 pymongo
+sentence-transformers
 spacy
 lxml
 beautifulsoup4

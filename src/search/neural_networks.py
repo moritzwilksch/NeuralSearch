@@ -15,7 +15,9 @@ class AutoEncoder(tf.keras.Model):
         # self.hidden3 = tf.keras.layers.Dense(units=512, activation="swish")
         # self.hidden4 = tf.keras.layers.Dense(units=512, activation="swish")
         # self.hidden5 = tf.keras.layers.Dense(units=512, activation="swish")
-        self.bottleneck = tf.keras.layers.Dense(units=bottleneck_dim, activation="relu")
+        self.bottleneck = tf.keras.layers.Dense(
+            units=bottleneck_dim, activation="linear"
+        )
         self.out = tf.keras.layers.Dense(units=vocab_size, activation="relu")
 
     def call(self, inputs, return_vector: bool = False):
