@@ -37,7 +37,9 @@ class TfidfSearchModel(BaseSearchModel):
     def fit(self, data: pl.DataFrame) -> None:
         self.data = data
         self.vectorizer.fit(self.data["body"].to_list())
-        self.vectorized_articles = self.vectorizer.transform(self.data["body"].to_list())
+        self.vectorized_articles = self.vectorizer.transform(
+            self.data["body"].to_list()
+        )
         return self.vectorized_articles
 
     def search(self, query: str) -> pl.DataFrame:

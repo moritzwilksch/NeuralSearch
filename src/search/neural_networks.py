@@ -1,5 +1,4 @@
 import os
-from multiprocessing.dummy import active_children
 
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 
