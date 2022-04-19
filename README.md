@@ -18,3 +18,17 @@ Now, to be fair, their platform is actually quite good and the main landing page
 |:---:|:---:|
 |Loads of articles|The search results for "inactivity fee"|
 
+# The Solution
+## TFIDF-based sub-word similarity
+A simple solution based on similarity matching of the TFIDF representation of subwords in the articles yields quite an improvement over the status quo:
+
+**Results for query: "inactivity fee"**
+
+*Does IBKR provide for a dormant or inactive account status?*  
+- While there is no provision for dormant or inactive account status, there is no monthly minimum activity requirement or inactivity fee in your IBKR account. While we have no minimum account balance, [...]
+
+*Overview of Fees*  
+- Clients and as well as prospective clients are encouraged to review our website where fees are outlined in detail. [...]
+
+## Encoder Model
+WIP.
