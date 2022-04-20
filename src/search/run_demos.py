@@ -17,25 +17,26 @@ from src.search.models import (
 
 df = pl.read_parquet("data/ibkr_articles.parquet")
 
+QUERY = "inactivity fee"
 # model = TfidfSearchModel()
 # model.fit(df)
-# results = model.search("inactivity fee")
+# results = model.search(QUERY)
 
 
 # model = SpacyEmbeddingModel()
 # model.fit(df)
-# results = model.search("inactivity fee")
+# results = model.search(QUERY)
 # print("done")
 
 # model = AutoEncoderModel()
 # model.fit(df)
-# results = model.search("inactivity fee")
+# results = model.search(QUERY)
 # print(results)
 
 
 model = SentenceEncoderModel()
 model.fit(df)
-results = model.search("inactivity fee")
+results = model.search(QUERY)
 print(results)
 
 for url, title, body in results.rows():

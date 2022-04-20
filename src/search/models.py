@@ -139,23 +139,24 @@ class SentenceEncoderModel(BaseSearchModel):
     def fit(self, data: pl.DataFrame) -> None:
         super().fit(data)
 
-        self.model = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
+        self.model = SentenceTransformer("multi-qa-MiniLM-L6-cos-v1")
         print("loaded")
 
-        self.doc_emb = []
+        self.document_embeddings = []  # per doc: as many embeddings as sentences
         for doc in track(self.data["body"].to_list(), description="Indexing docs..."):
             sentence_encodings = self.model.encode(doc.split(". "))
-            self.doc_emb.append([sentence_encodings.mean(axis=0)])
-        self.doc_emb = np.array(self.doc_emb).squeeze()
-        print(self.doc_emb.shape)
-        # self.doc_emb = self.model.encode(self.data["body"].to_list())
+            self.document_embeddings.append(sentence_encodings)
+
+        self.document_embeddings = np.array(self.document_embeddings)
 
     def search(self, query: str) -> pl.DataFrame:
         query_emb = self.model.encode([query])
-        # scores = util.dot_score(query_emb, self.doc_emb)[0].cpu().tolist()
-        # top_idxs = self.top_k([scores], 3)
 
-        similarities = cosine_similarity(query_emb, self.doc_emb)
-        top_idxs = self.top_k(similarities, 3)
+        mean_doc_similarities = []
+        for doc_embeddings in self.document_embeddings:
+            per_sentence_similarities = cosine_similarity(query_emb, doc_embeddings)
+            mean_doc_similarities.append(per_sentence_similarities.mean())
+
+        top_idxs = self.top_k([mean_doc_similarities], 3)
 
         return self.data[top_idxs]
