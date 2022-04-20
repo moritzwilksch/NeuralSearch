@@ -17,9 +17,9 @@ from src.search.models import (
 
 df = pl.read_parquet("data/ibkr_articles.parquet")
 
-model = TfidfSearchModel()
-model.fit(df)
-results = model.search("inactivity fee")
+# model = TfidfSearchModel()
+# model.fit(df)
+# results = model.search("inactivity fee")
 
 
 # model = SpacyEmbeddingModel()
@@ -33,10 +33,10 @@ results = model.search("inactivity fee")
 # print(results)
 
 
-# model = SentenceEncoderModel()
-# model.fit(df)
-# results = model.search("inactivity fee")
-# print(results)
+model = SentenceEncoderModel()
+model.fit(df)
+results = model.search("inactivity fee")
+print(results)
 
 for url, title, body in results.rows():
     c.print(Panel(f"{title}", style="bold"))

@@ -143,10 +143,21 @@ class SentenceEncoderModel(BaseSearchModel):
         )
         print("loaded")
 
-        self.doc_emb = self.model.encode(self.data["body"].to_list())
+        self.doc_emb = []
+        for doc in self.data["body"].to_list():
+            sentence_encodings = self.model.encode(doc.split(". "))
+            self.doc_emb.append([sentence_encodings.mean(axis=0)])
+        self.doc_emb = np.array(self.doc_emb).squeeze()
+        print(self.doc_emb.shape)
+        # self.doc_emb = self.model.encode(self.data["body"].to_list())
 
     def search(self, query: str) -> pl.DataFrame:
         query_emb = self.model.encode([query])
-        scores = util.dot_score(query_emb, self.doc_emb)[0].cpu().tolist()
-        top_idxs = self.top_k([scores], 3)
+        # scores = util.dot_score(query_emb, self.doc_emb)[0].cpu().tolist()
+        # top_idxs = self.top_k([scores], 3)
+        
+        similarities = cosine_similarity(query_emb, self.doc_emb)
+        top_idxs = self.top_k(similarities, 3)
+
+
         return self.data[top_idxs]
