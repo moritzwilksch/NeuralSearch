@@ -31,4 +31,14 @@ A simple solution based on similarity matching of the TFIDF representation of su
 - Clients and as well as prospective clients are encouraged to review our website where fees are outlined in detail. [...]
 
 ## Encoder Model
-WIP.
+Use `SentenceTransformer` (multi-qa-MiniLM-L6-cos-v1) to embed each sentence into latetent space. Score each sentence's similarity to the query embedding. The similarity score for a document is calculated as the mean over all sentence embeddings in the document.
+
+**Results for query: "inactivity fee"**
+
+*How do I change the fees which I charge my clients?*  
+-  Overview: Advisor accounts have the ability to configure the fees which they assess to their clients. [...]
+
+*Options Regulatory Fee (ORF)*
+- The ORF is an exchange fee which OCC collects from its clearing members, including IBKR. [...]
+
+
