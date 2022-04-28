@@ -1,4 +1,5 @@
 pymongo
+elasticsearch
 sentence-transformers
 spacy
 lxml

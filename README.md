@@ -41,4 +41,12 @@ Use `SentenceTransformer` (multi-qa-MiniLM-L6-cos-v1) to embed each sentence int
 *Options Regulatory Fee (ORF)*
 - The ORF is an exchange fee which OCC collects from its clearing members, including IBKR. [...]
 
+## Elastic Search
 
+**Results for query: "inactivity fee"**
+
+*Does IBKR provide for a dormant or inactive account status?*  
+- While there is no provision for dormant or inactive account status, there is no monthly minimum activity requirement or inactivity fee in your IBKR account. While we have no minimum account balance, [...]
+
+*Overview of Fees*  
+- Clients and as well as prospective clients are encouraged to review our website where fees are outlined in detail. [...]
